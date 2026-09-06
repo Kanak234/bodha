@@ -1,0 +1,23 @@
+# Keep development files and test scaffolding out of the packaged .vsix.
+
+src/
+test/
+test_suite_analysis/
+.vscode/
+.git/
+.github/
+*.vsix
+*.log
+node_modules/
+build/
+dist/
+coverage/
+*.map
+tsconfig.json
+eslint.config.js
+.prettierrc
+CHANGELOG.md
+.vscodeignore
+.gitignore
+bodha.analyze
+docs/
