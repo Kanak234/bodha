@@ -1,0 +1,45 @@
+name: CI
+
+# This workflow validates the extension's reproducible development checks on every change.
+# It does not publish the extension, access credentials, or modify repository contents.
+# The goal is to catch TypeScript, lint, and regression-test failures before release.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Node.js is used because BODHA's compiler, linter, tests, and packaging tools are Node-based.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # npm ci uses the committed lockfile so CI does not silently resolve a different dependency graph.
+      - name: Install dependencies
+        run: npm ci
+
+      # TypeScript compilation is the extension's primary static correctness check.
+      - name: Compile TypeScript
+        run: npm run compile
+
+      # Linting catches maintainability and consistency problems without changing source files.
+      - name: Lint source
+        run: npm run lint
+
+      # The repository already defines a regression-test command for its implemented behavior.
+      - name: Run tests
+        run: npm test
