@@ -5,8 +5,15 @@
   "version": "0.4.0",
   "publisher": "KANAKPRABHAKAR",
   "license": "MIT",
-  "engines": { "vscode": "^1.85.0" },
-  "categories": ["Programming Languages", "Education", "Visualization", "Debuggers"],
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Education",
+    "Visualization",
+    "Debuggers"
+  ],
   "keywords": [
     "compiler",
     "visualization",
@@ -29,75 +36,271 @@
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
-      { "command": "bodha.analyze", "title": "BODHA: Analyze Current File", "icon": "$(play)" },
-      { "command": "bodha.runCode", "title": "BODHA: Run Code", "icon": "$(play)" },
-      { "command": "bodha.stopExecution", "title": "BODHA: Stop Execution", "icon": "$(debug-stop)" },
-      { "command": "bodha.runPipeline", "title": "BODHA: Run Pipeline", "icon": "$(play)" },
-      { "command": "bodha.compilerVisualizer", "title": "BODHA: Open Compiler Visualizer", "icon": "$(telescope)" },
-      { "command": "bodha.showTokens", "title": "BODHA: Show Tokens" },
-      { "command": "bodha.showAST", "title": "BODHA: Show AST" },
-      { "command": "bodha.showSymbolTable", "title": "BODHA: Show Symbol Table" },
-      { "command": "bodha.showIR", "title": "BODHA: Show IR / Three-Address Code" },
-      { "command": "bodha.showOptimizations", "title": "BODHA: Show Optimizations" },
-      { "command": "bodha.showCFG", "title": "BODHA: Show Control Flow Graph" },
-      { "command": "bodha.showDataFlow", "title": "BODHA: Show Data Flow Analysis" },
-      { "command": "bodha.showAssembly", "title": "BODHA: Show Assembly" },
-      { "command": "bodha.showRuntime", "title": "BODHA: Show Runtime" },
-      { "command": "bodha.startTimeline", "title": "BODHA: Start Timeline" },
-      { "command": "bodha.compareStages", "title": "BODHA: Compare Stages" },
-      { "command": "bodha.detectToolchains", "title": "BODHA: Detect Toolchains" },
-      { "command": "bodha.configureToolchain", "title": "BODHA: Configure Toolchain" },
-      { "command": "bodha.exportReport", "title": "BODHA: Export Report" },
-      { "command": "bodha.clearDiagnostics", "title": "BODHA: Clear Diagnostics" },
-      { "command": "bodha.explainCompilerError", "title": "BODHA: Explain Compiler Error" }
+      {
+        "command": "bodha.analyze",
+        "title": "BODHA: Analyze Current File",
+        "icon": "$(play)"
+      },
+      {
+        "command": "bodha.runCode",
+        "title": "BODHA: Run Code",
+        "icon": "$(play)"
+      },
+      {
+        "command": "bodha.stopExecution",
+        "title": "BODHA: Stop Execution",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "bodha.runPipeline",
+        "title": "BODHA: Run Pipeline",
+        "icon": "$(play)"
+      },
+      {
+        "command": "bodha.compilerVisualizer",
+        "title": "BODHA: Open Compiler Visualizer",
+        "icon": "$(telescope)"
+      },
+      {
+        "command": "bodha.showTokens",
+        "title": "BODHA: Show Tokens"
+      },
+      {
+        "command": "bodha.showAST",
+        "title": "BODHA: Show AST"
+      },
+      {
+        "command": "bodha.showSymbolTable",
+        "title": "BODHA: Show Symbol Table"
+      },
+      {
+        "command": "bodha.showIR",
+        "title": "BODHA: Show IR / Three-Address Code"
+      },
+      {
+        "command": "bodha.showOptimizations",
+        "title": "BODHA: Show Optimizations"
+      },
+      {
+        "command": "bodha.showCFG",
+        "title": "BODHA: Show Control Flow Graph"
+      },
+      {
+        "command": "bodha.showDataFlow",
+        "title": "BODHA: Show Data Flow Analysis"
+      },
+      {
+        "command": "bodha.showAssembly",
+        "title": "BODHA: Show Assembly"
+      },
+      {
+        "command": "bodha.showRuntime",
+        "title": "BODHA: Show Runtime"
+      },
+      {
+        "command": "bodha.startTimeline",
+        "title": "BODHA: Start Timeline"
+      },
+      {
+        "command": "bodha.compareStages",
+        "title": "BODHA: Compare Stages"
+      },
+      {
+        "command": "bodha.detectToolchains",
+        "title": "BODHA: Detect Toolchains"
+      },
+      {
+        "command": "bodha.configureToolchain",
+        "title": "BODHA: Configure Toolchain"
+      },
+      {
+        "command": "bodha.exportReport",
+        "title": "BODHA: Export Report"
+      },
+      {
+        "command": "bodha.clearDiagnostics",
+        "title": "BODHA: Clear Diagnostics"
+      },
+      {
+        "command": "bodha.explainCompilerError",
+        "title": "BODHA: Explain Compiler Error"
+      }
     ],
     "keybindings": [
-      { "command": "bodha.analyze", "key": "ctrl+alt+b", "mac": "cmd+alt+b", "when": "editorLangId == c || editorLangId == cpp || editorLangId == java || editorLangId == python" },
-      { "command": "bodha.runCode", "key": "ctrl+alt+r", "mac": "cmd+alt+r", "when": "editorLangId == c || editorLangId == cpp || editorLangId == java || editorLangId == python" },
-      { "command": "bodha.stopExecution", "key": "ctrl+alt+s", "mac": "cmd+alt+s" },
-      { "command": "bodha.runPipeline", "key": "ctrl+alt+shift+b", "mac": "cmd+alt+shift+b", "when": "bodha.panelVisible" }
+      {
+        "command": "bodha.analyze",
+        "key": "ctrl+alt+b",
+        "mac": "cmd+alt+b",
+        "when": "editorLangId == c || editorLangId == cpp || editorLangId == java || editorLangId == python"
+      },
+      {
+        "command": "bodha.runCode",
+        "key": "ctrl+alt+r",
+        "mac": "cmd+alt+r",
+        "when": "editorLangId == c || editorLangId == cpp || editorLangId == java || editorLangId == python"
+      },
+      {
+        "command": "bodha.stopExecution",
+        "key": "ctrl+alt+s",
+        "mac": "cmd+alt+s"
+      },
+      {
+        "command": "bodha.runPipeline",
+        "key": "ctrl+alt+shift+b",
+        "mac": "cmd+alt+shift+b",
+        "when": "bodha.panelVisible"
+      }
     ],
     "menus": {
       "editor/title": [
-        { "command": "bodha.analyze", "when": "editorLangId == c || editorLangId == cpp || editorLangId == java || editorLangId == python", "group": "navigation@1" },
-        { "command": "bodha.runCode", "when": "editorLangId == c || editorLangId == cpp || editorLangId == java || editorLangId == python", "group": "navigation@2" },
-        { "command": "bodha.stopExecution", "when": "editorLangId == c || editorLangId == cpp || editorLangId == java || editorLangId == python", "group": "navigation@3" }
+        {
+          "command": "bodha.analyze",
+          "when": "editorLangId == c || editorLangId == cpp || editorLangId == java || editorLangId == python",
+          "group": "navigation@1"
+        },
+        {
+          "command": "bodha.runCode",
+          "when": "editorLangId == c || editorLangId == cpp || editorLangId == java || editorLangId == python",
+          "group": "navigation@2"
+        },
+        {
+          "command": "bodha.stopExecution",
+          "when": "editorLangId == c || editorLangId == cpp || editorLangId == java || editorLangId == python",
+          "group": "navigation@3"
+        }
       ],
       "editor/context": [
-        { "command": "bodha.analyze", "when": "editorLangId == c || editorLangId == cpp || editorLangId == java || editorLangId == python", "group": "bodha@1" },
-        { "command": "bodha.runCode", "when": "editorLangId == c || editorLangId == cpp || editorLangId == java || editorLangId == python", "group": "bodha@2" }
+        {
+          "command": "bodha.analyze",
+          "when": "editorLangId == c || editorLangId == cpp || editorLangId == java || editorLangId == python",
+          "group": "bodha@1"
+        },
+        {
+          "command": "bodha.runCode",
+          "when": "editorLangId == c || editorLangId == cpp || editorLangId == java || editorLangId == python",
+          "group": "bodha@2"
+        }
       ],
       "commandPalette": [
-        { "command": "bodha.runPipeline", "when": "bodha.panelVisible" },
-        { "command": "bodha.stopExecution" },
-        { "command": "bodha.clearDiagnostics" }
+        {
+          "command": "bodha.runPipeline",
+          "when": "bodha.panelVisible"
+        },
+        {
+          "command": "bodha.stopExecution"
+        },
+        {
+          "command": "bodha.clearDiagnostics"
+        }
       ]
     },
     "configuration": {
       "title": "BODHA",
       "properties": {
-        "bodha.toolchains.c": { "type": "string", "default": "gcc", "description": "C compiler command" },
-        "bodha.toolchains.cpp": { "type": "string", "default": "g++", "description": "C++ compiler command" },
-        "bodha.toolchains.java": { "type": "string", "default": "javac", "description": "Java compiler command" },
-        "bodha.toolchains.python": { "type": "string", "default": "python3", "description": "Python interpreter command" },
-        "bodha.toolchains.compilerPath": { "type": "string", "default": "", "description": "Folder or full path to compiler executables when not on PATH" },
-        "bodha.toolchains.javaRuntime": { "type": "string", "default": "java", "description": "Java runtime command" },
-        "bodha.toolchains.javap": { "type": "string", "default": "javap", "description": "Java class file disassembler" },
-        "bodha.pipeline.timeout": { "type": "number", "default": 120, "description": "Seconds before pipeline stage times out" },
-        "bodha.pipeline.maxOutput": { "type": "number", "default": 1048576, "description": "Maximum output bytes per stage" },
-        "bodha.visualization.maxNodes": { "type": "number", "default": 5000, "description": "Maximum AST/CFG nodes to render" },
-        "bodha.visualization.maxTimelineFrames": { "type": "number", "default": 200, "description": "Maximum timeline frames to retain" },
-        "bodha.visualization.theme": { "type": "string", "enum": ["dark", "light", "auto"], "default": "auto", "description": "Visualization theme" },
-        "bodha.mode": { "type": "string", "enum": ["educational", "real", "compare"], "default": "educational", "description": "Default visualization mode" },
-        "bodha.autoAnalyze": { "type": "boolean", "default": false, "description": "Automatically analyze file on save" },
-        "bodha.export.outputDir": { "type": "string", "default": "", "description": "Default export directory" }
+        "bodha.toolchains.c": {
+          "type": "string",
+          "default": "gcc",
+          "description": "C compiler command"
+        },
+        "bodha.toolchains.cpp": {
+          "type": "string",
+          "default": "g++",
+          "description": "C++ compiler command"
+        },
+        "bodha.toolchains.java": {
+          "type": "string",
+          "default": "javac",
+          "description": "Java compiler command"
+        },
+        "bodha.toolchains.python": {
+          "type": "string",
+          "default": "python3",
+          "description": "Python interpreter command"
+        },
+        "bodha.toolchains.compilerPath": {
+          "type": "string",
+          "default": "",
+          "description": "Folder or full path to compiler executables when not on PATH"
+        },
+        "bodha.toolchains.javaRuntime": {
+          "type": "string",
+          "default": "java",
+          "description": "Java runtime command"
+        },
+        "bodha.toolchains.javap": {
+          "type": "string",
+          "default": "javap",
+          "description": "Java class file disassembler"
+        },
+        "bodha.pipeline.timeout": {
+          "type": "number",
+          "default": 120,
+          "description": "Seconds before pipeline stage times out"
+        },
+        "bodha.pipeline.maxOutput": {
+          "type": "number",
+          "default": 1048576,
+          "description": "Maximum output bytes per stage"
+        },
+        "bodha.visualization.maxNodes": {
+          "type": "number",
+          "default": 5000,
+          "description": "Maximum AST/CFG nodes to render"
+        },
+        "bodha.visualization.maxTimelineFrames": {
+          "type": "number",
+          "default": 200,
+          "description": "Maximum timeline frames to retain"
+        },
+        "bodha.visualization.theme": {
+          "type": "string",
+          "enum": [
+            "dark",
+            "light",
+            "auto"
+          ],
+          "default": "auto",
+          "description": "Visualization theme"
+        },
+        "bodha.mode": {
+          "type": "string",
+          "enum": [
+            "educational",
+            "real",
+            "compare"
+          ],
+          "default": "educational",
+          "description": "Default visualization mode"
+        },
+        "bodha.autoAnalyze": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically analyze file on save"
+        },
+        "bodha.export.outputDir": {
+          "type": "string",
+          "default": "",
+          "description": "Default export directory"
+        }
       }
     },
     "views": {
       "bodha": [
-        { "id": "bodha.pipeline", "name": "Pipeline", "when": "bodha.panelVisible" },
-        { "id": "bodha.artifacts", "name": "Artifacts", "when": "bodha.panelVisible" },
-        { "id": "bodha.timeline", "name": "Timeline", "when": "bodha.panelVisible" }
+        {
+          "id": "bodha.pipeline",
+          "name": "Pipeline",
+          "when": "bodha.panelVisible"
+        },
+        {
+          "id": "bodha.artifacts",
+          "name": "Artifacts",
+          "when": "bodha.panelVisible"
+        },
+        {
+          "id": "bodha.timeline",
+          "name": "Timeline",
+          "when": "bodha.panelVisible"
+        }
       ]
     },
     "viewsContainers": {
@@ -115,7 +318,8 @@
     "watch": "tsc -watch -p ./",
     "test": "node test/run-tests.js",
     "package": "npx @vscode/vsce package",
-    "lint": "eslint src --ext ts"
+    "lint": "eslint src --ext ts",
+    "build": "npm run compile"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
@@ -125,6 +329,11 @@
     "@typescript-eslint/eslint-plugin": "^6.13.0",
     "@typescript-eslint/parser": "^6.13.0"
   },
-  "repository": { "type": "git", "url": "https://github.com/Kanak234/bodha" },
-  "bugs": { "url": "https://github.com/Kanak234/bodha/issues" }
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kanak234/bodha"
+  },
+  "bugs": {
+    "url": "https://github.com/Kanak234/bodha/issues"
+  }
 }
