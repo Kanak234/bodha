@@ -1,19 +1,40 @@
+# Dependencies
 node_modules/
+
+# Compilation output
 out/
+dist/
+build/
+*.vsix
+
+# Python caches and environments
 __pycache__/
 *.pyc
+venv/
+.venv/
+
+# Environment and secrets
 .env
 .env.*
 !*.env.example
 *.pem
 *.key
 credentials*
-venv/
-.venv/
+
+# Test and coverage artifacts
+coverage/
+.c8_output/
+*.log
+
+# Editor and AI local settings
+.vscode/
+.claude/
+
+# Compiled objects and models
 target/
-dist/
-build/
 *.gguf
 *.pt
 *.safetensors
-*.vsix
+*.o
+*.out
+*.class

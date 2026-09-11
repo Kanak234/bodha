@@ -1,62 +1,22 @@
 'use strict';
 
 const { test, assertEqual } = require('./harness');
+const vscodeMock = require('./vscode-mock');
+const { getActiveSourceDocument, SUPPORTED_LANGUAGES } = require('../out/activeDocumentManager');
 
-console.log('\nBODHA Active Document Detection Tests');
-
-const SUPPORTED_LANGUAGES = ['c', 'cpp', 'java', 'python'];
-
-// Authoritative document detection logic mirroring activeDocumentManager.ts
-function resolveActiveDocumentState(vscodeMock) {
-  let editor = vscodeMock.window.activeTextEditor;
-
-  if (!editor || !editor.document || editor.document.uri.scheme !== 'file') {
-    const visible = (vscodeMock.window.visibleTextEditors || []).filter(
-      e => e.document && e.document.uri.scheme === 'file'
-    );
-    if (visible.length > 0) {
-      editor = visible[0];
-    }
-  }
-
-  if (!editor || !editor.document || editor.document.uri.scheme !== 'file') {
-    return {
-      editor: null,
-      document: null,
-      fsPath: null,
-      languageId: '',
-      isSupported: false,
-      text: '',
-    };
-  }
-
-  const langId = editor.document.languageId;
-  const isSupported = SUPPORTED_LANGUAGES.includes(langId);
-
-  return {
-    editor,
-    document: editor.document,
-    fsPath: editor.document.uri.fsPath,
-    languageId: langId,
-    isSupported,
-    unsupportedLang: isSupported ? undefined : langId,
-    text: editor.document.getText(),
-  };
-}
+console.log('\nBODHA Active Document Detection Tests (Real Module)');
 
 test('Active document detection - C file', () => {
-  const mock = {
-    window: {
-      activeTextEditor: {
-        document: {
-          uri: { scheme: 'file', fsPath: '/path/to/main.c' },
-          languageId: 'c',
-          getText: () => 'int main() { return 0; }'
-        }
-      }
+  vscodeMock.window.activeTextEditor = {
+    document: {
+      uri: vscodeMock.Uri.file('/path/to/main.c'),
+      languageId: 'c',
+      getText: () => 'int main() { return 0; }'
     }
   };
-  const res = resolveActiveDocumentState(mock);
+  vscodeMock.window.visibleTextEditors = [vscodeMock.window.activeTextEditor];
+
+  const res = getActiveSourceDocument();
   assertEqual(res.isSupported, true);
   assertEqual(res.languageId, 'c');
   assertEqual(res.fsPath, '/path/to/main.c');
@@ -64,121 +24,129 @@ test('Active document detection - C file', () => {
 });
 
 test('Active document detection - C++ file', () => {
-  const mock = {
-    window: {
-      activeTextEditor: {
-        document: {
-          uri: { scheme: 'file', fsPath: '/path/to/app.cpp' },
-          languageId: 'cpp',
-          getText: () => '#include <iostream>\nint main() {}'
-        }
-      }
+  vscodeMock.window.activeTextEditor = {
+    document: {
+      uri: vscodeMock.Uri.file('/path/to/app.cpp'),
+      languageId: 'cpp',
+      getText: () => '#include <iostream>\nint main() {}'
     }
   };
-  const res = resolveActiveDocumentState(mock);
+  vscodeMock.window.visibleTextEditors = [vscodeMock.window.activeTextEditor];
+
+  const res = getActiveSourceDocument();
   assertEqual(res.isSupported, true);
   assertEqual(res.languageId, 'cpp');
   assertEqual(res.fsPath, '/path/to/app.cpp');
 });
 
 test('Active document detection - Java file', () => {
-  const mock = {
-    window: {
-      activeTextEditor: {
-        document: {
-          uri: { scheme: 'file', fsPath: '/path/to/Main.java' },
-          languageId: 'java',
-          getText: () => 'public class Main { public static void main(String[] args) {} }'
-        }
-      }
+  vscodeMock.window.activeTextEditor = {
+    document: {
+      uri: vscodeMock.Uri.file('/path/to/Main.java'),
+      languageId: 'java',
+      getText: () => 'public class Main { public static void main(String[] args) {} }'
     }
   };
-  const res = resolveActiveDocumentState(mock);
+  vscodeMock.window.visibleTextEditors = [vscodeMock.window.activeTextEditor];
+
+  const res = getActiveSourceDocument();
   assertEqual(res.isSupported, true);
   assertEqual(res.languageId, 'java');
+  assertEqual(res.fsPath, '/path/to/Main.java');
 });
 
 test('Active document detection - Python file', () => {
-  const mock = {
-    window: {
-      activeTextEditor: {
-        document: {
-          uri: { scheme: 'file', fsPath: '/path/to/script.py' },
-          languageId: 'python',
-          getText: () => 'print("Hello BODHA")'
-        }
-      }
+  vscodeMock.window.activeTextEditor = {
+    document: {
+      uri: vscodeMock.Uri.file('/path/to/script.py'),
+      languageId: 'python',
+      getText: () => 'print("Hello BODHA")'
     }
   };
-  const res = resolveActiveDocumentState(mock);
+  vscodeMock.window.visibleTextEditors = [vscodeMock.window.activeTextEditor];
+
+  const res = getActiveSourceDocument();
   assertEqual(res.isSupported, true);
   assertEqual(res.languageId, 'python');
+  assertEqual(res.fsPath, '/path/to/script.py');
 });
 
 test('Active document detection - No active editor', () => {
-  const mock = {
-    window: {
-      activeTextEditor: null,
-      visibleTextEditors: []
-    }
-  };
-  const res = resolveActiveDocumentState(mock);
+  vscodeMock.window.activeTextEditor = null;
+  vscodeMock.window.visibleTextEditors = [];
+
+  const res = getActiveSourceDocument();
   assertEqual(res.isSupported, false);
   assertEqual(res.fsPath, null);
   assertEqual(res.languageId, '');
+  assertEqual(res.editor, null);
+  assertEqual(res.document, null);
 });
 
 test('Active document detection - Fallback to visible editor when webview focused', () => {
-  const mock = {
-    window: {
-      activeTextEditor: undefined,
-      visibleTextEditors: [
-        {
-          document: {
-            uri: { scheme: 'file', fsPath: '/workspace/foo.c' },
-            languageId: 'c',
-            getText: () => 'int foo = 42;'
-          }
-        }
-      ]
+  vscodeMock.window.activeTextEditor = null;
+  vscodeMock.window.visibleTextEditors = [
+    {
+      document: {
+        uri: vscodeMock.Uri.file('/workspace/foo.c'),
+        languageId: 'c',
+        getText: () => 'int foo = 42;'
+      }
     }
-  };
-  const res = resolveActiveDocumentState(mock);
+  ];
+
+  const res = getActiveSourceDocument();
   assertEqual(res.isSupported, true);
   assertEqual(res.languageId, 'c');
   assertEqual(res.fsPath, '/workspace/foo.c');
+  assertEqual(res.text, 'int foo = 42;');
 });
 
 test('Active document detection - Unsupported file type', () => {
-  const mock = {
-    window: {
-      activeTextEditor: {
-        document: {
-          uri: { scheme: 'file', fsPath: '/path/to/config.json' },
-          languageId: 'json',
-          getText: () => '{ "key": "val" }'
-        }
-      }
+  vscodeMock.window.activeTextEditor = {
+    document: {
+      uri: vscodeMock.Uri.file('/path/to/config.json'),
+      languageId: 'json',
+      getText: () => '{ "key": "val" }'
     }
   };
-  const res = resolveActiveDocumentState(mock);
+  vscodeMock.window.visibleTextEditors = [vscodeMock.window.activeTextEditor];
+
+  const res = getActiveSourceDocument();
   assertEqual(res.isSupported, false);
   assertEqual(res.languageId, 'json');
   assertEqual(res.unsupportedLang, 'json');
 });
 
-test('Active document detection - Switching between source files', () => {
-  const docC = { uri: { scheme: 'file', fsPath: '/src/main.c' }, languageId: 'c', getText: () => 'int a;' };
-  const docJava = { uri: { scheme: 'file', fsPath: '/src/App.java' }, languageId: 'java', getText: () => 'class App {}' };
+test('Active document detection - Non-file URI scheme ignored', () => {
+  vscodeMock.window.activeTextEditor = {
+    document: {
+      uri: { scheme: 'output', fsPath: 'output:extension-output' },
+      languageId: 'plaintext',
+      getText: () => 'log text'
+    }
+  };
+  vscodeMock.window.visibleTextEditors = [];
 
-  const mock = { window: { activeTextEditor: { document: docC } } };
-  let res = resolveActiveDocumentState(mock);
+  const res = getActiveSourceDocument();
+  assertEqual(res.isSupported, false);
+  assertEqual(res.editor, null);
+});
+
+test('Active document detection - Switching between source files', () => {
+  const docC = { uri: vscodeMock.Uri.file('/src/main.c'), languageId: 'c', getText: () => 'int a;' };
+  const docJava = { uri: vscodeMock.Uri.file('/src/App.java'), languageId: 'java', getText: () => 'class App {}' };
+
+  vscodeMock.window.activeTextEditor = { document: docC };
+  vscodeMock.window.visibleTextEditors = [vscodeMock.window.activeTextEditor];
+  let res = getActiveSourceDocument();
   assertEqual(res.fsPath, '/src/main.c');
   assertEqual(res.languageId, 'c');
 
   // Switch to Java
-  mock.window.activeTextEditor = { document: docJava };
-  res = resolveActiveDocumentState(mock);
+  vscodeMock.window.activeTextEditor = { document: docJava };
+  vscodeMock.window.visibleTextEditors = [vscodeMock.window.activeTextEditor];
+  res = getActiveSourceDocument();
   assertEqual(res.fsPath, '/src/App.java');
   assertEqual(res.languageId, 'java');
 });
@@ -186,43 +154,48 @@ test('Active document detection - Switching between source files', () => {
 test('Active document detection - Editing active source file', () => {
   let sourceText = 'int a = 1;';
   const doc = {
-    uri: { scheme: 'file', fsPath: '/src/main.c' },
+    uri: vscodeMock.Uri.file('/src/main.c'),
     languageId: 'c',
     getText: () => sourceText
   };
-  const mock = { window: { activeTextEditor: { document: doc } } };
+  vscodeMock.window.activeTextEditor = { document: doc };
+  vscodeMock.window.visibleTextEditors = [vscodeMock.window.activeTextEditor];
 
-  let res = resolveActiveDocumentState(mock);
+  let res = getActiveSourceDocument();
   assertEqual(res.text, 'int a = 1;');
 
   // Edit document
   sourceText = 'int a = 1;\nint b = 2;';
-  res = resolveActiveDocumentState(mock);
+  res = getActiveSourceDocument();
   assertEqual(res.text, 'int a = 1;\nint b = 2;');
 });
 
 test('Active document detection - Closing active source file', () => {
-  const mock = {
-    window: {
-      activeTextEditor: {
-        document: {
-          uri: { scheme: 'file', fsPath: '/src/main.c' },
-          languageId: 'c',
-          getText: () => 'int x;'
-        }
-      },
-      visibleTextEditors: []
+  vscodeMock.window.activeTextEditor = {
+    document: {
+      uri: vscodeMock.Uri.file('/src/main.c'),
+      languageId: 'c',
+      getText: () => 'int x;'
     }
   };
-  let res = resolveActiveDocumentState(mock);
+  vscodeMock.window.visibleTextEditors = [vscodeMock.window.activeTextEditor];
+  let res = getActiveSourceDocument();
   assertEqual(res.isSupported, true);
 
   // Close file
-  mock.window.activeTextEditor = null;
-  mock.window.visibleTextEditors = [];
-  res = resolveActiveDocumentState(mock);
+  vscodeMock.window.activeTextEditor = null;
+  vscodeMock.window.visibleTextEditors = [];
+  res = getActiveSourceDocument();
   assertEqual(res.isSupported, false);
   assertEqual(res.fsPath, null);
+});
+
+test('Supported languages array includes all expected languages', () => {
+  assertEqual(SUPPORTED_LANGUAGES.includes('c'), true);
+  assertEqual(SUPPORTED_LANGUAGES.includes('cpp'), true);
+  assertEqual(SUPPORTED_LANGUAGES.includes('java'), true);
+  assertEqual(SUPPORTED_LANGUAGES.includes('python'), true);
+  assertEqual(SUPPORTED_LANGUAGES.length, 4);
 });
 
 console.log('Active document tests completed.');

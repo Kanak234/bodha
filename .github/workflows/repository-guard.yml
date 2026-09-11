@@ -1,0 +1,38 @@
+name: Repository Guard
+
+on:
+  push:
+    branches: [master, main, prod-hardening]
+  pull_request:
+    branches: [master, main, prod-hardening]
+
+permissions:
+  contents: read
+
+jobs:
+  hygiene:
+    name: Repository Hygiene & Integrity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for merge conflict markers
+        run: |
+          if git grep -En "^(<<<<<<<|=======|>>>>>>>)" -- ':!*.md'; then
+            echo "Merge conflict markers detected!"
+            exit 1
+          fi
+
+      - name: Verify no large committed binaries
+        run: |
+          find . -type f -size +10M -not -path '*/.*' | while read -r file; do
+            echo "Large file detected: $file"
+            exit 1
+          done
+
+      - name: Check for trailing whitespace
+        run: |
+          git diff --check HEAD~1 HEAD 2>/dev/null || true

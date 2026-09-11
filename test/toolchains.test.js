@@ -1,48 +1,73 @@
 'use strict';
 
 const { test, assertEqual } = require('./harness');
+const vscodeMock = require('./vscode-mock');
+const { ToolchainDetector } = require('../out/toolchains/ToolchainDetector');
 
-console.log('\nBODHA Toolchain Detector Tests');
+console.log('\nBODHA Toolchain Detector Tests (Real Module)');
 
-// Mock function mirroring ToolchainDetector strict lookup logic
-function detectToolchainCommand(configuredCmd, installedMap) {
-  if (installedMap[configuredCmd]) {
-    return {
-      command: configuredCmd,
-      version: installedMap[configuredCmd],
-      status: 'AVAILABLE'
-    };
-  }
-  return {
-    command: configuredCmd,
-    status: 'TOOLCHAIN NOT FOUND'
-  };
-}
+const mockContext = {
+  subscriptions: [],
+  extensionPath: '/fake/path',
+  asAbsolutePath: (p) => p,
+};
 
-test('Toolchain Detection - GCC Available', () => {
-  const installed = { gcc: 'gcc (Ubuntu 11.4.0) 11.4.0' };
-  const res = detectToolchainCommand('gcc', installed);
-  assertEqual(res.status, 'AVAILABLE');
+test('Toolchain Detection - GCC Available', async () => {
+  const detector = new ToolchainDetector(mockContext);
+  const res = await detector.findExactCompiler('gcc', '');
+  assertEqual(typeof res, 'object');
   assertEqual(res.command, 'gcc');
+  assertEqual(typeof res.version, 'string');
 });
 
-test('Toolchain Detection - Missing Toolchain returns TOOLCHAIN NOT FOUND', () => {
-  const installed = { gcc: 'gcc 11.4' }; // non_existent_compiler is not installed
-  const res = detectToolchainCommand('non_existent_compiler', installed);
-  assertEqual(res.status, 'TOOLCHAIN NOT FOUND');
+test('Toolchain Detection - Missing Toolchain returns undefined', async () => {
+  const detector = new ToolchainDetector(mockContext);
+  const res = await detector.findExactCompiler('non_existent_compiler_xyz_123', '');
+  assertEqual(res, undefined);
 });
 
-test('Toolchain Detection - Java / javac Available', () => {
-  const installed = { javac: 'javac 17.0.8' };
-  const res = detectToolchainCommand('javac', installed);
-  assertEqual(res.status, 'AVAILABLE');
-  assertEqual(res.command, 'javac');
+test('Toolchain Detection - Python3 Available', async () => {
+  const detector = new ToolchainDetector(mockContext);
+  const res = await detector.findExactCompiler('python3', '');
+  assertEqual(typeof res, 'object');
+  assertEqual(res.command, 'python3');
+  assertEqual(typeof res.version, 'string');
 });
 
-test('Toolchain Detection - Python3 Available', () => {
-  const installed = { python3: 'Python 3.10.12' };
-  const res = detectToolchainCommand('python3', installed);
-  assertEqual(res.status, 'AVAILABLE');
+test('Toolchain Detection - detect() checks all configured languages', async () => {
+  const detector = new ToolchainDetector(mockContext);
+  const info = await detector.detect();
+  assertEqual(typeof info, 'object');
+  assertEqual('c' in info, true);
+  assertEqual('cpp' in info, true);
+  assertEqual('java' in info, true);
+  assertEqual('python' in info, true);
+  assertEqual('javaRuntime' in info, true);
+  assertEqual('javap' in info, true);
+});
+
+test('Toolchain Detection - detectAndShow() displays results in output channel', async () => {
+  let channelCreated = false;
+  let shownText = '';
+  const originalCreateOutputChannel = vscodeMock.window.createOutputChannel;
+  vscodeMock.window.createOutputChannel = (name) => ({
+    name,
+    show: () => { channelCreated = true; },
+    appendLine: (txt) => { shownText = txt; },
+    append: () => {},
+    clear: () => {},
+    dispose: () => {},
+  });
+
+  try {
+    const detector = new ToolchainDetector(mockContext);
+    const info = await detector.detectAndShow();
+    assertEqual(channelCreated, true);
+    assertEqual(shownText.includes('BODHA Toolchain Detection'), true);
+    assertEqual(typeof info, 'object');
+  } finally {
+    vscodeMock.window.createOutputChannel = originalCreateOutputChannel;
+  }
 });
 
 console.log('Toolchain tests completed.');

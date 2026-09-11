@@ -1,0 +1,13 @@
+.git
+.github
+.vscode
+.claude
+node_modules
+out
+dist
+build
+coverage
+.c8_output
+*.vsix
+*.log
+docs

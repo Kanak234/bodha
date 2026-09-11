@@ -4,6 +4,7 @@ src/
 test/
 test_suite_analysis/
 .vscode/
+.claude/
 .git/
 .github/
 *.vsix
@@ -12,6 +13,7 @@ node_modules/
 build/
 dist/
 coverage/
+.c8_output/
 *.map
 tsconfig.json
 eslint.config.js
@@ -21,3 +23,6 @@ CHANGELOG.md
 .gitignore
 bodha.analyze
 docs/
+Dockerfile
+.dockerignore
+SECURITY.md
