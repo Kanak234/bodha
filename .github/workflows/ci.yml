@@ -1,45 +1,78 @@
 name: CI
 
-# This workflow validates the extension's reproducible development checks on every change.
-# It does not publish the extension, access credentials, or modify repository contents.
-# The goal is to catch TypeScript, lint, and regression-test failures before release.
-
 on:
   push:
-    branches: [master]
+    branches: [master, main, prod-hardening]
   pull_request:
-    branches: [master]
+    branches: [master, main, prod-hardening]
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
+    name: Node ${{ matrix.node-version }} Test & Build
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [18, 20, 22]
+
     steps:
-      # Node.js is used because BODHA's compiler, linter, tests, and packaging tools are Node-based.
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ matrix.node-version }}
           cache: npm
 
-      # npm ci uses the committed lockfile so CI does not silently resolve a different dependency graph.
+      - name: Install compiler toolchains
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends gcc g++ python3 default-jdk-headless
+
       - name: Install dependencies
         run: npm ci
 
-      # TypeScript compilation is the extension's primary static correctness check.
       - name: Compile TypeScript
         run: npm run compile
 
-      # Linting catches maintainability and consistency problems without changing source files.
       - name: Lint source
         run: npm run lint
 
-      # The repository already defines a regression-test command for its implemented behavior.
-      - name: Run tests
-        run: npm test
+      - name: Run test suite with coverage
+        run: npm run test:coverage
+
+      - name: Package VSIX bundle
+        run: |
+          mkdir -p dist
+          npx @vscode/vsce package --allow-missing-repository --out dist/
+
+  docker:
+    name: Container Build & Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: bodha:smoke
+
+      - name: Run Container Smoke Tests
+        run: |
+          docker run --rm bodha:smoke node test/run-tests.js
